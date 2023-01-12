@@ -1,9 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WatchDog.Common;
 using WatchDog.Config;
-using WatchDog.Jobs;
 using WatchDog.Model;
 using WatchDog.Queries;
 
