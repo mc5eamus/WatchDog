@@ -1,5 +1,8 @@
 ﻿namespace WatchDog.Model
 {
+    /// <summary>
+    /// Some other example model returned by a query
+    /// </summary>
     public class ExtendedModel : BaseModel
     {
         public string SomeProperty { get; set; }

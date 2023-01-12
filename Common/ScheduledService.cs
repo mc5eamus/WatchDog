@@ -6,13 +6,20 @@ using WatchDog.Config;
 
 namespace WatchDog.Common
 {
+    /// <summary>
+    /// Base class for scheduled job execution
+    /// </summary>
     public abstract class ScheduledService : BackgroundService
     {
         private readonly ILogger logger;
         private readonly IScheduleConfig config;
         private readonly CronExpression cronExpression;
-        private IOptions<ScheduleConfig<object>> config1;
 
+        /// <summary>
+        /// Supposed to be created by DI
+        /// </summary>
+        /// <param name="logger">Logger (we're keeping it neutral for now, the inheriting class can request a specific one)</param>
+        /// <param name="config">Config for scheduling (don't confuse with Query settings like connection strings</param>
         public ScheduledService(ILogger logger, IOptions<IScheduleConfig> config)
         {
             this.logger = logger;
@@ -20,8 +27,16 @@ namespace WatchDog.Common
             this.cronExpression = CronExpression.Parse(config.Value.CronExpression);
         }
 
+        /// <summary>
+        /// Make the logger available to the inheriting classes in a safe way
+        /// </summary>
         protected ILogger Logger => logger;
 
+        /// <summary>
+        /// Overrides the BackgroundService exec
+        /// </summary>
+        /// <param name="ctoken"></param>
+        /// <returns></returns>
         protected override async Task ExecuteAsync(CancellationToken ctoken)
         {
             while (!ctoken.IsCancellationRequested)
@@ -34,8 +49,18 @@ namespace WatchDog.Common
             }
         }
 
+        /// <summary>
+        /// Supposed to be implemented by inheriting classes
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         protected abstract Task DoWork(CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Central piece of the scheduler: calculated a timespan to wait for the next scheduled execution
+        /// </summary>
+        /// <param name="ctoken"></param>
+        /// <returns></returns>
         private async Task WaitForNextSchedule(CancellationToken ctoken)
         {
             var currentUtcTime = DateTimeOffset.UtcNow.UtcDateTime;

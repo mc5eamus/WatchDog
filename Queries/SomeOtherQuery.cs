@@ -6,6 +6,9 @@ using WatchDog.Model;
 
 namespace WatchDog.Queries
 {
+    /// <summary>
+    /// Example of a query as part of a watchdog, spitting out <see cref="ExtendedModel">ExtendedModel</see>
+    /// </summary>
     public class SomeOtherQuery : IQuery<ExtendedModel>
     {
         ILogger logger;
