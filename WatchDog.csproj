@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -11,11 +11,8 @@
     <PackageReference Include="Longbow.Cronos" Version="1.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="7.0.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Publishers\" />
   </ItemGroup>
 
   <ItemGroup>

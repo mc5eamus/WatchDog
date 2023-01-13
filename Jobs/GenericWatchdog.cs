@@ -18,6 +18,7 @@ namespace WatchDog.Jobs
         private readonly TQuery query;
         private readonly ILogger logger;
         private readonly IScheduleConfig config;
+        private readonly IPublisher publisher;
 
         /// <summary>
         /// All parameters of the Generic Watchdog are supposed to be implicitly provided by DI
@@ -25,9 +26,13 @@ namespace WatchDog.Jobs
         /// <param name="query">Query to execute incl. the output type as parameter</param>
         /// <param name="logger">Logger (we're requesting a specific type for the class</param>
         /// <param name="config">Config for scheduling (don't confuse with Query settings like connection strings</param>
-        public GenericWatchdog(TQuery query, ILogger<TQuery> logger, IOptions<ScheduleConfig<TQuery>> config) : base (logger, config)
+        public GenericWatchdog(TQuery query, 
+            IPublisher publisher, 
+            ILogger<TQuery> logger, 
+            IOptions<ScheduleConfig<TQuery>> config) : base (logger, config)
         {
             this.query = query;
+            this.publisher = publisher;
             this.logger = logger;
             this.config = config.Value;
             logger.LogInformation($"{this.config.CronExpression} for {typeof(TQuery).Name}");
@@ -43,6 +48,8 @@ namespace WatchDog.Jobs
             Logger.LogInformation($"{this.GetType().Name} started");
 
             TModel queryResult = await query.Execute(cancellationToken);
+
+            await publisher.Publish(queryResult, cancellationToken);
 
             Logger.LogInformation($"{queryResult}");
         }

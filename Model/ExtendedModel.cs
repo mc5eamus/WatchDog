@@ -5,7 +5,7 @@
     /// </summary>
     public class ExtendedModel : BaseModel
     {
-        public string SomeProperty { get; set; }
+        public string? SomeProperty { get; set; }
 
         public override string ToString()
         {

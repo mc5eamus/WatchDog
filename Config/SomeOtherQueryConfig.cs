@@ -5,6 +5,6 @@
     /// </summary>
     public class SomeOtherQueryConfig
     {
-        public string SomeOtherServiceConnectionString { get; set; }
+        public string? SomeOtherServiceConnectionString { get; set; }
     }
 }

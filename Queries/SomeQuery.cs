@@ -22,7 +22,7 @@ namespace WatchDog.Queries
 
         public async Task<BaseModel> Execute(CancellationToken ctoken)
         {
-            int delay = 1 + Random.Shared.Next(10);
+            int delay = 1 + Random.Shared.Next(5);
             logger.LogInformation($"{this.GetType().Name} is running for {delay}s");
             await Task.Delay(1000 * delay, ctoken);
             return await Task.FromResult(new BaseModel() { Id = 1 });
