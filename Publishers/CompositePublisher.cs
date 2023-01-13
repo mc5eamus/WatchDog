@@ -1,7 +1,6 @@
 ﻿using Polly.Registry;
 using Polly.Retry;
 using Polly.Timeout;
-using System.Runtime.CompilerServices;
 using WatchDog.Contract;
 using WatchDog.Resiliency;
 
