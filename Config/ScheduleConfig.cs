@@ -15,8 +15,12 @@
     /// Implements <see cref="IScheduleConfig">the contract</see> and provides a specific implementation for typed scheduling configs 
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ScheduleConfig<T> : IScheduleConfig
+    public class ScheduleConfig<TWorker> : IScheduleConfig
     {
         public string CronExpression { get; set; } = string.Empty;
+        
+        // for a multiconfig scenario, identifies configs to run on a given schedule
+        public IEnumerable<string> Configs { get; set; } = Enumerable.Empty<string>();
     }
+
 }

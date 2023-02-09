@@ -1,7 +1,7 @@
 ﻿namespace WatchDog.Model
 {
     /// <summary>
-    /// Some other example model returned by a query
+    /// Some other example model returned by a query or a data source
     /// </summary>
     public class ExtendedModel : BaseModel
     {

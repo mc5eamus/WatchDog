@@ -14,7 +14,6 @@ namespace WatchDog.Publishers
         {
             this.logger = logger;
         }
-
         protected ILogger Logger => logger;
 
         /// <summary>

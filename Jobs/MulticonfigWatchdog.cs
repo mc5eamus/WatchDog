@@ -11,13 +11,15 @@ namespace WatchDog.Jobs
     /// </summary>
     /// <typeparam name="TQuery">Query type to execute</typeparam>
     /// <typeparam name="TModel">Model returned by the query</typeparam>
-    public class GenericWatchdog<TQuery, TModel> : ScheduledService
-        where TQuery : IQuery<TModel>
+    public class MulticonfigWatchdog<TDataSource, TConfig, TModel> : ScheduledService
+        where TDataSource : IDataSource<TModel, TConfig>
+        where TConfig : class
         where TModel : class
     {
-        private readonly TQuery query;
+        private readonly TDataSource dataSource;
         private readonly ILogger logger;
-        private readonly IScheduleConfig config;
+        private readonly ScheduleConfig<TDataSource> scheduleConfig;
+        private readonly IEnumerable<TConfig> dataSourceConfig;
         private readonly IPublisher publisher;
 
         /// <summary>
@@ -26,22 +28,24 @@ namespace WatchDog.Jobs
         /// <param name="query">Query to execute incl. the output type as parameter</param>
         /// <param name="logger">Logger (we're requesting a specific type for the class</param>
         /// <param name="config">Config for scheduling (don't confuse with Query settings like connection strings</param>
-        public GenericWatchdog(TQuery query, 
+        public MulticonfigWatchdog(TDataSource dataSource, 
             IPublisher publisher, 
-            ILogger<TQuery> logger, 
-            IOptions<ScheduleConfig<TQuery>> config
-            ) : base (logger, config)
+            ILogger<MulticonfigWatchdog<TDataSource, TConfig, TModel>> logger,
+            IOptions<ScheduleConfig<TDataSource>> scheduleConfig,
+            IOptions<IEnumerable<TConfig>> dataSourceConfig
+            ) : base (logger, scheduleConfig)
         {
-            this.query = query;
+            this.dataSource = dataSource;
+            this.scheduleConfig = scheduleConfig.Value;
+            this.dataSourceConfig = dataSourceConfig.Value;
             this.publisher = publisher;
             this.logger = logger;
-            this.config = config.Value;
-            logger.LogInformation($"{this.config.CronExpression} for {typeof(TQuery).Name}");
+            logger.LogInformation($"{this.scheduleConfig.CronExpression} for {typeof(TDataSource).Name}");
         }
 
         /// <summary>
         /// The actual workload and implementation for the ScheduledService, will be called when the execution is due
-        /// accorting to the schedule
+        /// accorting to the schedule, will execute the worker for all assigned configurations
         /// </summary>
         /// <param name="cancellationToken">cancellation token for termination, use consistently in all downstream async operations</param>
         /// <returns>async void</returns>
@@ -49,11 +53,13 @@ namespace WatchDog.Jobs
         {
             Logger.LogInformation($"{this.GetType().Name} started");
 
-            TModel queryResult = await query.Execute(cancellationToken);
-
-            await publisher.Publish(queryResult, cancellationToken);
-
-            Logger.LogInformation($"{queryResult}");
+            // iterates through all configs scheduled to run
+            foreach(var dsConfig in dataSourceConfig)
+            {
+                TModel queryResult = await dataSource.Execute(dsConfig, cancellationToken);
+                await publisher.Publish(queryResult, cancellationToken);
+                Logger.LogInformation($"{queryResult}");
+            }
         }
     }
 }
